@@ -1,0 +1,10 @@
+{
+    "externalPostprocessors": [
+        {
+            "Name":"UC1-Postprocessor",
+            "Command":"/opt/networkoptix-metavms/mediaserver/bin/plugins/nxai_plugin/nxai_manager/postprocessors/postprocessor-python-example",
+            "SocketPath":"/tmp/uc1-postprocessor.sock",
+            "ReceiveInputTensor": 0
+        }
+    ]
+}

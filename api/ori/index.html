@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gauge Example</title>
+    <script src="https://bernii.github.io/gauge.js/dist/gauge.min.js"></script>
+    <style>
+        /* Make body take up the full height of the viewport */
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Make canvas responsive and fill the entire page */
+        canvas#gauge {
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            min-width: 100%; /* Ensure minimum width */
+            min-height: 100%; /* Ensure minimum height */
+        }
+
+    </style>
+</head>
+<body>
+    <canvas id="gauge"></canvas>
+    <script>
+            function GetADC() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var adc = Number(this.responseText);
+                        // Update the gauge with the fetched value
+                        gauge.set(adc);
+                    }
+                };
+
+                xhttp.open("GET", "/value", true); // Changed to asynchronous request
+                xhttp.send();
+            }
+
+            // Call GetADC initially to populate the gauge
+            GetADC();
+
+            // Set up periodic fetching and updating of the gauge
+            setInterval(GetADC, 100); // Fetches and updates the gauge every second
+
+
+        staticLabels= {
+          font: "30px sans-serif",  // Specifies font
+          labels: [0, 25, 50, 75, 100],  // Print labels at these values
+          color: "#000000",  // Optional: Label text color
+          fractionDigits: 0  // Optional: Numerical precision. 0=round off.
+        }
+        staticZones= [
+           {strokeStyle: "#F03E3E", min: 0, max: 25}, // Red from 100 to 130
+           {strokeStyle: "#FFDD00", min: 25, max: 50}, // Yellow
+           {strokeStyle: "#30B32D", min: 50, max: 75}, // Green
+           {strokeStyle: "#0088ff", min: 75, max: 100}, // Yellow
+        ]
+        var opts = {
+            lines: 12,
+            angle: 0,
+            lineWidth: 0.4,
+            pointer: {
+                length: 0.75,
+                strokeWidth: 0.035,
+                color: '#000000'
+            },
+            limitMax: false,
+            colorStart: '#6FADCF',
+            colorStop: '#8FC0DA',
+            strokeColor: '#E0E0E0',
+            generateGradient: true,
+            staticZones: staticZones,
+            staticLabels: staticLabels
+        };
+        var target = document.getElementById('gauge');
+        var gauge = new Gauge(target).setOptions(opts);
+        gauge.maxValue = 100;
+        gauge.setMinValue(0);  // Prefer setter over gauge.minValue = 0
+        gauge.animationSpeed = 32; // set animation speed (32 is default value)
+        gauge.set(50); // set actual value
+        // set percentColor
+
+
+    </script>
+</body>
+</html>

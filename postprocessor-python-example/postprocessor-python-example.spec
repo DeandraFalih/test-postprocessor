@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['postprocessor-python-example.py'],
-    pathex=['/home/prince/EVOS/develop/sclbl-integration-sdk/sclbl-utilities/python-utilities'],
+    pathex=['/home/robin/evs-demo-code/sclbl-utilities/python-utilities'],
     binaries=[],
     datas=[],
     hiddenimports=[],
