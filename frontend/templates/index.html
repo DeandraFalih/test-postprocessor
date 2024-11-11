@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Parker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .status-icon {
+            font-size: 1.5em;
+        }
+        .status-icon.occupied {
+            color: #ff6666;
+        }
+        .status-icon.vacant {
+            color: #66ff66;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 25px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 30px;
+            width: 0;
+            background-color: #66ff66;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            border-radius: 25px 0 0 25px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Digital Parker</h1>
+
+    <h2>Spot Occupancy</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Spot</th>
+                <th>Status</th>
+                <th>Time Occupied (seconds)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Spot 1</td>
+                <td id="status_spot1"><span class="status-icon">😐</span></td>
+                <td id="time_spot1">0</td>
+            </tr>
+            <tr>
+                <td>Spot 2</td>
+                <td id="status_spot2"><span class="status-icon">😐</span></td>
+                <td id="time_spot2">0</td>
+            </tr>
+            <tr>
+                <td>Spot 3</td>
+                <td id="status_spot3"><span class="status-icon">😐</span></td>
+                <td id="time_spot3">0</td>
+            </tr>
+            <tr>
+                <td>Spot 4</td>
+                <td id="status_spot4"><span class="status-icon">😐</span></td>
+                <td id="time_spot4">0</td>
+            </tr>
+            <tr>
+                <td>Spot 5(Disabled/Parent Parking)</td>
+                <td id="status_spot5"><span class="status-icon">😐</span></td>
+                <td id="time_spot5">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Overall Status</h2>
+    <div class="progress-container">
+        <div id="progress-bar" class="progress-bar">0%</div>
+    </div>
+    <p id="empty_spots">Empty Spots: 0</p>
+    <p id="filled_spots">Filled Spots: 0</p>
+
+    <h2>Heatmap</h2>
+    <img id="heatmap" src="/heatmap" alt="Heatmap" style="width: 300px; height: auto;">
+
+    <script>
+        let timeIntervals = {};
+
+        function updateOccupancy() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var data = JSON.parse(this.responseText);
+                    var occupancy = data.occupancy;
+                    var empty_spots = data.empty_spots;
+                    var filled_spots = data.filled_spots;
+                    var occupancy_durations = data.occupancy_durations;
+
+                    for (var spot in occupancy) {
+                        var statusElement = document.getElementById("status_" + spot.toLowerCase());
+                        var timeElement = document.getElementById("time_" + spot.toLowerCase());
+                        if (occupancy[spot]) {
+                            statusElement.innerHTML = '<span class="status-icon occupied">🔴</span> Occupied';
+                            startTimer(timeElement, spot);
+                        } else {
+                            statusElement.innerHTML = '<span class="status-icon vacant">🟢</span> Vacant';
+                            resetTime(timeElement, spot);
+                        }
+                    }
+
+                    document.getElementById("empty_spots").innerText = "Empty Spots: " + empty_spots;
+                    document.getElementById("filled_spots").innerText = "Filled Spots: " + filled_spots;
+
+                    // Update progress bar
+                    var totalSpots = empty_spots + filled_spots;
+                    var filledPercentage = (filled_spots / totalSpots) * 100;
+                    var progressBar = document.getElementById("progress-bar");
+                    progressBar.style.width = filledPercentage + "%";
+                    progressBar.innerText = Math.round(filledPercentage) + "%";
+                }
+            };
+            xhttp.open("GET", "/occupancy", true);
+            xhttp.send();
+        }
+
+        function updateHeatmap() {
+            document.getElementById("heatmap").src = "/heatmap?" + new Date().getTime();
+        }
+
+        function startTimer(element, spot) {
+            if (timeIntervals[spot]) {
+                return;
+            }
+            timeIntervals[spot] = setInterval(() => {
+                element.innerText = (parseFloat(element.innerText) + 1).toFixed(2);
+            }, 1000);
+        }
+
+        function resetTime(element, spot) {
+            clearInterval(timeIntervals[spot]);
+            timeIntervals[spot] = null;
+            element.innerText = "0.00";
+        }
+
+        setInterval(updateOccupancy, 5000);
+        setInterval(updateHeatmap, 10000);
+        updateOccupancy();
+        updateHeatmap();
+    </script>
+</body>
+</html>

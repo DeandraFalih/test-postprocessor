@@ -1,0 +1,5 @@
+[submodule "sclbl-utilities"]
+	path = sclbl-utilities
+	url = https://github.com/scailable/sclbl-utilities.git
+	branch = main
+	update = rebase
