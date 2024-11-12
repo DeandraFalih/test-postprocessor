@@ -60,7 +60,7 @@ def check_occupancy(bboxes):
 # Route untuk halaman utama
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index2.html')
 
 # Endpoint untuk menerima data bounding box dari Nx Meta
 @app.route('/add_message', methods=['POST'])
