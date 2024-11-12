@@ -57,6 +57,11 @@ def check_occupancy(bboxes):
             occupancy = False
             occupancy_durations[time.time()] = time.time() - occupancy_start_time
 
+# Route untuk halaman utama
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 # Endpoint untuk menerima data bounding box dari Nx Meta
 @app.route('/add_message', methods=['POST'])
 def add_message():
