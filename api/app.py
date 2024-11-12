@@ -20,8 +20,8 @@ occupancy = {spot: False for spot in spots}
 occupancy_frame_counts = {spot: 0 for spot in spots}
 occupancy_timestamps = {spot: time.time() for spot in spots}
 occupancy_durations = {spot: 0 for spot in spots}
-frame_threshold = 5
-occupancy_threshold = 3
+frame_threshold = 0.35
+occupancy_threshold = 0.35
 
 # Track frame counts and midpoints
 frame_count = 0
