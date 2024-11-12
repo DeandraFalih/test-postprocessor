@@ -3,44 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stop Lane Detection</title>
+    <title>Parking Occupancy Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .zone-status {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .zone {
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px;
-            width: 200px;
-            text-align: center;
-        }
-        .occupied {
-            color: red;
-        }
-        .empty {
-            color: green;
-        }
+        .container { max-width: 800px; margin-top: 20px; }
+        .occupancy-status { font-size: 1.5rem; margin-bottom: 10px; }
+        .duration-list { font-size: 1.2rem; }
+        .heatmap { margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<h1>Stop Lane Detection</h1>
-<div class="zone-status">
-    {% for zone, status in occupancy.items() %}
-    <div class="zone {{ 'occupied' if status else 'empty' }}">
-        <h3>{{ zone }}</h3>
-        <p>Status: {{ 'Occupied' if status else 'Empty' }}</p>
+<div class="container">
+    <h1 class="text-center">Parking Occupancy Detection</h1>
+
+    <div id="occupancy-status" class="occupancy-status">
+        Loading occupancy status...
     </div>
-    {% endfor %}
+
+    <h2>Occupancy Durations</h2>
+    <ul id="duration-list" class="duration-list">
+        Loading durations...
+    </ul>
+
+    <div class="heatmap text-center">
+        <h2>Heatmap</h2>
+        <img id="heatmap-image" src="/heatmap" alt="Heatmap Image" class="img-fluid">
+    </div>
 </div>
+
+<script>
+    async function fetchOccupancyData() {
+        try {
+            const response = await fetch('/occupancy');
+            const data = await response.json();
+
+            // Update occupancy status
+            const occupancyStatus = document.getElementById('occupancy-status');
+            occupancyStatus.textContent = data.occupancy ? 'Occupied' : 'Empty';
+
+            // Update duration list
+            const durationList = document.getElementById('duration-list');
+            durationList.innerHTML = '';
+            for (const [timestamp, duration] of Object.entries(data.occupancy_durations)) {
+                const listItem = document.createElement('li');
+                const formattedDuration = new Date(duration * 1000).toISOString().substr(11, 8);
+                listItem.textContent = `Time: ${new Date(parseFloat(timestamp) * 1000).toLocaleTimeString()}, Duration: ${formattedDuration}`;
+                durationList.appendChild(listItem);
+            }
+        } catch (error) {
+            console.error('Error fetching occupancy data:', error);
+        }
+    }
+
+    // Refresh data every 5 seconds
+    setInterval(fetchOccupancyData, 5000);
+    fetchOccupancyData();
+</script>
 
 </body>
 </html>
