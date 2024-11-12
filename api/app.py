@@ -90,7 +90,7 @@ def generate_heatmap(midpoints):
 def index():
     heatmap = np.zeros((720, 960), dtype=np.float32)
     cv2.imwrite('static/heatmap.jpg', heatmap)
-    return render_template('index.html', occupancy=occupancy, occupancy_durations=occupancy_durations)
+    return render_template('index3.html', occupancy=occupancy, occupancy_durations=occupancy_durations)
 
 @app.route('/add_message', methods=['POST'])
 def add_message():
