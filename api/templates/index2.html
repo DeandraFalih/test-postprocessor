@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vehicle Occupancy System</title>
+    <title>Stop Lane Detection</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,7 +32,7 @@
 </head>
 <body>
 
-<h1>Vehicle Occupancy System</h1>
+<h1>Stop Lane Detection</h1>
 <div class="zone-status">
     {% for zone, status in occupancy.items() %}
     <div class="zone {{ 'occupied' if status else 'empty' }}">

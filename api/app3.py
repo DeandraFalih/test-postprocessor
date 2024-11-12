@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Define the polygonal zones and initialize state tracking
 polygon_zones = {
-    'Zone1': [(100, 100), (300, 100), (300, 300), (100, 300)],
+    'Stop Lane': [(865, 326), (1053, 328), (1266, 511), (981, 516)],
 }
 occupancy = {zone: False for zone in polygon_zones}
 occupancy_start_time = {zone: 0 for zone in polygon_zones}
