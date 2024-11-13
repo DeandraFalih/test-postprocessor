@@ -25,10 +25,9 @@ occupancy_threshold = 0.35
 
 # Track frame counts and midpoints
 frame_count = 0
-midpoints = []
 
 def check_occupancy(bboxes):
-    global occupancy, occupancy_frame_counts, occupancy_timestamps, occupancy_durations, frame_count, midpoints
+    global occupancy, occupancy_frame_counts, occupancy_timestamps, occupancy_durations
     inside_spot = {spot: False for spot in spots.keys()}
 
     for i in range(0, len(bboxes), 4):
@@ -36,11 +35,10 @@ def check_occupancy(bboxes):
 
         # Calculate midpoint
         midpoint = ((x_min + x_max) // 2, (y_min + y_max) // 2)
-        midpoints.append(midpoint)
 
         # Check if midpoint is inside any spot polygon
         for spot, polygon in spots.items():
-            mask = np.zeros((720, 960), dtype=np.uint8)
+            mask = np.zeros((1280, 720), dtype=np.uint8)  # Updated resolution to (1280, 720)
             cv2.fillPoly(mask, [np.array(polygon, dtype=np.int32)], color=(255, 255, 255))
             if mask[midpoint[1], midpoint[0]] == 255:
                 inside_spot[spot] = True
@@ -65,31 +63,8 @@ def check_occupancy(bboxes):
             occupancy_durations[spot] = time.time() - occupancy_timestamps[spot]
             occupancy_timestamps[spot] = time.time()
 
-    frame_count += 1
-
-    # Generate heatmap every 10 frames
-    if frame_count >= 10:
-        generate_heatmap(midpoints)
-        frame_count = 0
-        midpoints = []
-
-def generate_heatmap(midpoints):
-    heatmap = np.zeros((720, 960), dtype=np.float32)
-    for midpoint in midpoints:
-        x, y = midpoint
-        heatmap[y, x] += 1
-
-    heatmap = cv2.GaussianBlur(heatmap, (31, 31), 0)
-    heatmap = np.uint8(255 * heatmap / np.max(heatmap))
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-
-    # Save heatmap to file
-    cv2.imwrite('static/heatmap.jpg', heatmap)
-
 @app.route('/')
 def index():
-    heatmap = np.zeros((720, 960), dtype=np.float32)
-    cv2.imwrite('static/heatmap.jpg', heatmap)
     return render_template('index3.html', occupancy=occupancy, occupancy_durations=occupancy_durations)
 
 @app.route('/add_message', methods=['POST'])
@@ -109,10 +84,6 @@ def get_occupancy():
         'filled_spots': sum(1 for occupied in occupancy.values() if occupied),
         'occupancy_durations': occupancy_durations
     })
-
-@app.route('/heatmap', methods=['GET'])
-def get_heatmap():
-    return send_file('static/heatmap.jpg', mimetype='image/jpeg')
 
 if __name__ == '__main__':
     app.run(debug=True)
