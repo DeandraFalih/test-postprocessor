@@ -101,8 +101,8 @@
     <p id="empty_spots">Empty Spots: 0</p>
     <p id="filled_spots">Filled Spots: 0</p>
 
-    <h2>Heatmap</h2>
-    <img id="heatmap" src="/heatmap" alt="Heatmap" style="width: 300px; height: auto;">
+{#    <h2>Heatmap</h2>#}
+{#    <img id="heatmap" src="/heatmap" alt="Heatmap" style="width: 300px; height: auto;">#}
 
     <script>
         let timeIntervals = {};
@@ -144,9 +144,9 @@
             xhttp.send();
         }
 
-        function updateHeatmap() {
-            document.getElementById("heatmap").src = "/heatmap?" + new Date().getTime();
-        }
+        {#function updateHeatmap() {#}
+        {#    document.getElementById("heatmap").src = "/heatmap?" + new Date().getTime();#}
+
 
         function startTimer(element, spot) {
             if (timeIntervals[spot]) {
@@ -164,9 +164,9 @@
         }
 
         setInterval(updateOccupancy, 5000);
-        setInterval(updateHeatmap, 10000);
+        {#setInterval(updateHeatmap, 10000);#}
         updateOccupancy();
-        updateHeatmap();
+        {#updateHeatmap();#}
     </script>
 </body>
 </html>
